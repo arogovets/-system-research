@@ -1,130 +1,81 @@
-# Internal System Research
+# GPT-5.6 Agent Skills Catalog
 
-A reusable **Devin Agent Skill** for reconstructing an internal software system from **Confluence, Jira, GitHub history, and current code** before producing architecture diagrams or a knowledge-sharing deck.
+A **Devin-ready `.agents` skill catalog** containing proven agent methodologies adapted directly in their `SKILL.md` files for GPT-5.6.
 
-Designed for a quality-first run with **GPT-5.6 Luna + max reasoning**, while keeping the prompt lean and evidence-driven.
+The adaptations follow a pre-push release gate derived from:
+- OpenAI model guidance: https://developers.openai.com/api/docs/guides/latest-model
+- OpenAI Builder's Guide to GPT-5.6: https://openai.com/index/builders-guide-to-gpt-5-6/
 
-## Intended pipeline
+The gate is not merely a skill reference: every adjusted `SKILL.md` is created locally, checked against [`GPT-5.6-SKILL-CHECKLIST.md`](GPT-5.6-SKILL-CHECKLIST.md), and only pushed after the gate passes. The executed result is in [`validation/2026-09-01-pre-push.md`](validation/2026-09-01-pre-push.md).
 
-```text
-Confluence ─┐
-Jira ───────┼──> internal-system-research ──> verified research dossier
-GitHub ─────┤                                  │
-Current code┘                                  ├──> Archify
-                                               └──> K-Dense scientific-slides
-```
+## Install in Devin
 
-## Devin installation
+Download or copy this repository's **`.agents` directory** into a repository connected to Devin. Devin can then discover the skills under `.agents/skills/`.
 
-Connect this repository to Devin. Devin discovers the skill at:
+## Catalog
 
-```text
-.agents/skills/internal-system-research/SKILL.md
-```
+| Skill | Purpose | Example invocation |
+|---|---|---|
+| `internal-system-research-5.6` | Start from Jira and reconstruct the current internal system plus its evidence-backed history across Confluence, GitHub and code | `@skills:internal-system-research-5.6 PROJ-123` |
+| `archify-5.6` | Turn requirements/research into validated architecture, workflow, sequence, data-flow or lifecycle diagrams | `@skills:archify-5.6 <research dossier or system>` |
+| `sci-slides-5.6` | Turn trusted research into a story-driven, cited, timed and visually reviewed technical/knowledge-sharing deck | `@skills:sci-slides-5.6 <research dossier + talk constraints>` |
 
-Invoke it explicitly from a Devin session:
+## Recommended pipeline
 
 ```text
-@skills:internal-system-research PROJECT-123
+Jira seed
+  ↓
+internal-system-research-5.6
+  ↓
+verified research dossier
+  ├────────────→ archify-5.6 ──→ validated architecture artifact
+  │
+  └───────────────────────────→ sci-slides-5.6
+                                  ↓
+                           knowledge-sharing deck
 ```
 
-or with a Jira URL:
+For your internal-system knowledge-sharing workflow, run research first, then Archify separately, then feed the verified dossier plus validated architecture into Scientific Slides.
 
-```text
-@skills:internal-system-research https://your-company.atlassian.net/browse/PROJECT-123
-```
+## GPT-5.6 adaptation principles
 
-The Jira ticket is treated as the **research seed, not the research boundary**. The skill follows linked issues, Confluence pages, PRs/commits, repositories, aliases, current code/config/tests, and historical evidence until the system model is sufficiently supported.
+The catalog intentionally applies the GPT-5.6 guidance rather than adding generic “think harder” instructions:
 
-## Required Devin access
-
-For the complete workflow, Devin should have read access to:
-
-- Jira
-- Confluence
-- relevant GitHub repositories
-- current code/config/tests in its workspace
-
-The skill is intentionally research-only: it may create local research artifacts but must not modify Jira, Confluence, GitHub, application code, configuration, or infrastructure.
+- reasoning effort is configured by the harness/caller instead of repeated in every skill;
+- prompts are outcome-first with explicit deliverables, scope, stop conditions and validation;
+- deterministic filtering/rendering/validation is moved into code/tools where practical;
+- model context is reserved for semantic judgment, prioritization, synthesis and perceptual review;
+- subagents are used only for cleanly independent workstreams, with the coordinator retaining synthesis;
+- long tasks persist durable artifacts instead of relying on conversational memory;
+- primary evidence is fetched directly when citations/artifacts must survive;
+- automated validity and subjective/perceptual quality are reported as separate claims.
 
 ## Skill structure
 
 ```text
 .agents/
 └── skills/
-    └── internal-system-research/
+    ├── internal-system-research-5.6/
+    │   ├── SKILL.md
+    │   └── UPSTREAM.md
+    ├── archify-5.6/
+    │   ├── SKILL.md
+    │   ├── UPSTREAM.md
+    │   └── scripts/bootstrap_archify.sh
+    └── sci-slides-5.6/
         ├── SKILL.md
-        ├── references/
-        │   ├── GPT56-CHECKLIST.md
-        │   └── UPSTREAM-SOURCES.md
-        └── templates/
-            ├── contradiction-entry.md
-            ├── contradictions.md
-            ├── evidence-entry.md
-            ├── evidence-index.md
-            ├── open-questions.md
-            ├── subagent-evidence-bundle.yaml
-            ├── system-research.md
-            └── timeline.md
+        ├── UPSTREAM.md
+        └── scripts/bootstrap_upstream_support.sh
 ```
 
-## What a research run produces
+The adapted instructions are always the `SKILL.md` inside each `*-5.6` directory. `UPSTREAM.md` is provenance only.
 
-- `system-research.md` — verified current-state explanation organized by system concerns rather than source.
-- `timeline.md` — major changes in chronological order with evidence and known motivation.
-- `evidence-index.md` — claim-to-source mapping with confidence and validity period.
-- `contradictions.md` — conflicts among docs, tickets, PRs, commits, tests, configs, and current code.
-- `open-questions.md` — unresolved gaps that must not be guessed.
+### Runtime/support handling
 
-## Core source hierarchy
+`archify-5.6` preserves the official Archify renderer/validator rather than reimplementing it in a prompt. Its bootstrap script retrieves the **pinned** upstream runtime and never overwrites the adapted `SKILL.md`.
 
-For **current behavior**, prefer evidence in this order unless specific evidence warrants otherwise:
+`sci-slides-5.6` is self-contained at the methodology level and tool-agnostic. Its optional support bootstrap retrieves K-Dense's pinned references/assets/scripts for additional implementation details; the upstream skill instructions do not replace the adapted GPT-5.6 skill.
 
-1. Executable current code, configuration, schemas, infrastructure definitions, and tests.
-2. Recently merged PRs and their review/discussion context.
-3. Current canonical Confluence documentation / ADRs.
-4. Jira issues describing implementation, incidents, bugs, or migrations.
-5. Older documentation and tickets as historical evidence only.
+## Model choice
 
-For **why a change happened**, never infer motivation from code alone. Trace backward through PR discussion, linked Jira, ADRs, Confluence design pages, and incident context.
-
-## GPT-5.6 methodology
-
-The skill includes a recommendation-to-implementation checklist based on:
-
-- OpenAI latest model guide: https://developers.openai.com/api/docs/guides/latest-model
-- OpenAI Builder's Guide to GPT-5.6: https://openai.com/index/builders-guide-to-gpt-5-6/
-
-See:
-
-`.agents/skills/internal-system-research/references/GPT56-CHECKLIST.md`
-
-It covers lean prompting, intentional `max` reasoning, autonomy boundaries, selective subagents, centralized synthesis, direct-vs-programmatic tool routing, durable research state, evidence requirements, and stopping criteria.
-
-## Upstream methodologies
-
-This skill adapts ideas from:
-
-- Atlassian `search-company-knowledge`: https://github.com/atlassian/atlassian-mcp-server/tree/main/skills/search-company-knowledge
-- LangChain Deep Agents: https://github.com/langchain-ai/deepagents
-- GitHub MCP Server: https://github.com/github/github-mcp-server
-- OpenAI GPT-5.6 guidance above
-
-See `.agents/skills/internal-system-research/references/UPSTREAM-SOURCES.md` for the exact methodology mapping.
-
-## Recommended Devin task prompt
-
-The reusable methodology belongs in the skill, so the task prompt can stay short:
-
-```text
-@skills:internal-system-research PROJECT-123
-
-Deeply research the internal system represented by this Jira ticket.
-Treat the ticket as the starting point, not the research boundary.
-Follow the skill through current-state verification, historical reconstruction,
-contradiction/evidence audit, and all required research artifacts.
-
-This is read-only research. Do not implement or modify the system.
-Before finishing, run the included GPT-5.6 quality checklist and report any
-items that could not be verified.
-```
+These skills are optimized for the GPT-5.6 family but do not hard-code model switching or reasoning effort. If you choose **GPT-5.6 Luna + max** in your harness, the skills focus that compute on evidence and judgment instead of spending prompt tokens repeatedly instructing the model to reason harder.

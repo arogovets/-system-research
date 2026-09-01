@@ -1,6 +1,6 @@
 # Internal System Research
 
-A focused agent skill for reconstructing an internal software system from **Confluence, Jira, GitHub history, and current code** before producing architecture diagrams or a knowledge-sharing deck.
+A reusable **Devin Agent Skill** for reconstructing an internal software system from **Confluence, Jira, GitHub history, and current code** before producing architecture diagrams or a knowledge-sharing deck.
 
 Designed for a quality-first run with **GPT-5.6 Luna + max reasoning**, while keeping the prompt lean and evidence-driven.
 
@@ -14,17 +14,71 @@ Current code┘                                  ├──> Archify
                                                └──> K-Dense scientific-slides
 ```
 
-## What this skill produces
+## Devin installation
 
-- `system-research.md` — verified current-state explanation, organized by system concerns rather than source.
-- `timeline.md` — major changes in chronological order, with evidence and known motivation.
+Connect this repository to Devin. Devin discovers the skill at:
+
+```text
+.agents/skills/internal-system-research/SKILL.md
+```
+
+Invoke it explicitly from a Devin session:
+
+```text
+@skills:internal-system-research PROJECT-123
+```
+
+or with a Jira URL:
+
+```text
+@skills:internal-system-research https://your-company.atlassian.net/browse/PROJECT-123
+```
+
+The Jira ticket is treated as the **research seed, not the research boundary**. The skill follows linked issues, Confluence pages, PRs/commits, repositories, aliases, current code/config/tests, and historical evidence until the system model is sufficiently supported.
+
+## Required Devin access
+
+For the complete workflow, Devin should have read access to:
+
+- Jira
+- Confluence
+- relevant GitHub repositories
+- current code/config/tests in its workspace
+
+The skill is intentionally research-only: it may create local research artifacts but must not modify Jira, Confluence, GitHub, application code, configuration, or infrastructure.
+
+## Skill structure
+
+```text
+.agents/
+└── skills/
+    └── internal-system-research/
+        ├── SKILL.md
+        ├── references/
+        │   ├── GPT56-CHECKLIST.md
+        │   └── UPSTREAM-SOURCES.md
+        └── templates/
+            ├── contradiction-entry.md
+            ├── contradictions.md
+            ├── evidence-entry.md
+            ├── evidence-index.md
+            ├── open-questions.md
+            ├── subagent-evidence-bundle.yaml
+            ├── system-research.md
+            └── timeline.md
+```
+
+## What a research run produces
+
+- `system-research.md` — verified current-state explanation organized by system concerns rather than source.
+- `timeline.md` — major changes in chronological order with evidence and known motivation.
 - `evidence-index.md` — claim-to-source mapping with confidence and validity period.
 - `contradictions.md` — conflicts among docs, tickets, PRs, commits, tests, configs, and current code.
 - `open-questions.md` — unresolved gaps that must not be guessed.
 
 ## Core source hierarchy
 
-For **current behavior**, prefer evidence in this order unless the system gives a reason to override it:
+For **current behavior**, prefer evidence in this order unless specific evidence warrants otherwise:
 
 1. Executable current code, configuration, schemas, infrastructure definitions, and tests.
 2. Recently merged PRs and their review/discussion context.
@@ -32,29 +86,45 @@ For **current behavior**, prefer evidence in this order unless the system gives 
 4. Jira issues describing implementation, incidents, bugs, or migrations.
 5. Older documentation and tickets as historical evidence only.
 
-For **why a change happened**, do not infer motivation from code alone. Trace backward through PR discussion, linked Jira, ADRs, Confluence design pages, and incident context.
+For **why a change happened**, never infer motivation from code alone. Trace backward through PR discussion, linked Jira, ADRs, Confluence design pages, and incident context.
+
+## GPT-5.6 methodology
+
+The skill includes a recommendation-to-implementation checklist based on:
+
+- OpenAI latest model guide: https://developers.openai.com/api/docs/guides/latest-model
+- OpenAI Builder's Guide to GPT-5.6: https://openai.com/index/builders-guide-to-gpt-5-6/
+
+See:
+
+`.agents/skills/internal-system-research/references/GPT56-CHECKLIST.md`
+
+It covers lean prompting, intentional `max` reasoning, autonomy boundaries, selective subagents, centralized synthesis, direct-vs-programmatic tool routing, durable research state, evidence requirements, and stopping criteria.
 
 ## Upstream methodologies
 
-This repository adapts, rather than blindly copies, ideas from:
+This skill adapts ideas from:
 
-- Atlassian `search-company-knowledge` skill: https://github.com/atlassian/atlassian-mcp-server/tree/main/skills/search-company-knowledge
+- Atlassian `search-company-knowledge`: https://github.com/atlassian/atlassian-mcp-server/tree/main/skills/search-company-knowledge
 - LangChain Deep Agents: https://github.com/langchain-ai/deepagents
 - GitHub MCP Server: https://github.com/github/github-mcp-server
-- OpenAI GPT-5.6 model guidance: https://developers.openai.com/api/docs/guides/latest-model
-- OpenAI Builder's Guide to GPT-5.6: https://openai.com/index/builders-guide-to-gpt-5-6/
+- OpenAI GPT-5.6 guidance above
 
-See [`GPT56-CHECKLIST.md`](GPT56-CHECKLIST.md) for the exact recommendation-to-implementation mapping.
+See `.agents/skills/internal-system-research/references/UPSTREAM-SOURCES.md` for the exact methodology mapping.
 
-## Usage
+## Recommended Devin task prompt
 
-Ask the agent to use `SKILL.md` and provide the internal system/topic plus any known repository/project/space hints.
+The reusable methodology belongs in the skill, so the task prompt can stay short:
 
-Example goal:
+```text
+@skills:internal-system-research PROJECT-123
 
-> Reconstruct the current architecture and historical evolution of `<SYSTEM>`. Research Confluence, Jira, GitHub PR/commit history, and current code. Separate current truth from historical state, explain why major changes happened only when supported by evidence, preserve citations/IDs for every material claim, and produce the five research artifacts defined by the skill.
+Deeply research the internal system represented by this Jira ticket.
+Treat the ticket as the starting point, not the research boundary.
+Follow the skill through current-state verification, historical reconstruction,
+contradiction/evidence audit, and all required research artifacts.
 
-## Scope boundary
-
-This is a **research skill**. It should not modify production code, Jira, Confluence, or GitHub. Read/search/fetch operations are in scope; external writes require a separate explicit request.
-# -system-research
+This is read-only research. Do not implement or modify the system.
+Before finishing, run the included GPT-5.6 quality checklist and report any
+items that could not be verified.
+```

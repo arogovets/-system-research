@@ -25,6 +25,7 @@ Download or copy this repository's **`.agents` directory** into a repository con
 These are intentionally **not** installed as always-discoverable skills.
 
 - [Devin + Claude Opus 5.5 monthly work review](prompts/devin-claude-opus-5.5-monthly-work-review.md) — reviews a month of transcripts/work evidence, audits the reusable agent setup, and applies a strong anti-bloat gate before creating or expanding skills.
+- [Devin + Claude Opus 5.5 Work Context & Mental Model Audit](prompts/devin-claude-opus-5.5-work-context-mental-model-audit.md) — reconstructs missing work context from Devin transcripts, researches high-leverage gaps across internal sources, and separates personal knowledge gaps from documentation, discoverability, infrastructure, ownership, process, and source-ambiguity problems.
 
 ## Recommended pipeline
 

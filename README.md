@@ -20,6 +20,12 @@ Download or copy this repository's **`.agents` directory** into a repository con
 | `archify-5.6` | Turn requirements/research into validated architecture, workflow, sequence, data-flow or lifecycle diagrams | `@skills:archify-5.6 <research dossier or system>` |
 | `sci-slides-5.6` | Turn trusted research into a story-driven, cited, timed and visually reviewed technical/knowledge-sharing deck | `@skills:sci-slides-5.6 <research dossier + talk constraints>` |
 
+## Standalone prompts
+
+These are intentionally **not** installed as always-discoverable skills.
+
+- [Devin + Claude Opus 5.5 monthly work review](prompts/devin-claude-opus-5.5-monthly-work-review.md) — reviews a month of transcripts/work evidence, audits the reusable agent setup, and applies a strong anti-bloat gate before creating or expanding skills.
+
 ## Recommended pipeline
 
 ```text

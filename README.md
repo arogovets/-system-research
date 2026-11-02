@@ -27,6 +27,7 @@ These are intentionally **not** installed as always-discoverable skills.
 - [Devin + Claude Opus 5.5 monthly work review](prompts/devin-claude-opus-5.5-monthly-work-review.md) — reviews a month of transcripts/work evidence, audits the reusable agent setup, and applies a strong anti-bloat gate before creating or expanding skills.
 - [Devin + Claude Opus 5.5 Work Context & Mental Model Audit](prompts/devin-claude-opus-5.5-work-context-mental-model-audit.md) — reconstructs missing work context from Devin transcripts, researches high-leverage gaps across internal sources, and separates personal knowledge gaps from documentation, discoverability, infrastructure, ownership, process, and source-ambiguity problems.
 - [Devin + Claude Opus 5.5 Jira Ticket Writing Alignment](prompts/devin-claude-opus-5.5-jira-ticket-writing-alignment.md) — learns the team's actual Jira description conventions from colleagues' tickets and Confluence guidance, compares the user's style against the team baseline, and writes a concise shared agent note for future Jira drafting.
+- [Devin + Claude Opus 5.5 PR, Commit & Branch Alignment](prompts/devin-claude-opus-5.5-pr-commit-branch-alignment.md) — learns the team's actual PR-description, commit-message, and branch-naming conventions from repository history and internal guidance, separates enforced rules from habits, and writes a concise shared agent note for future Git/PR work.
 
 ## Recommended pipeline
 
